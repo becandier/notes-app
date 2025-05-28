@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app/core/theme/theme_cubit.dart';
+import 'package:notes_app/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:notes_app/features/notes/presentation/bloc/notes_list_cubit.dart';
 import 'package:notes_app/features/notes/presentation/bloc/notes_list_state.dart';
 import 'package:notes_app/features/notes/presentation/pages/note_detail_page.dart';
@@ -8,7 +9,11 @@ import 'package:notes_app/features/notes/presentation/widgets/note_card.dart';
 
 /// Страница со списком заметок
 class NotesListPage extends StatefulWidget {
-  const NotesListPage({super.key});
+  /// Показывать ли AppBar
+  final bool showAppBar;
+  
+  /// Конструктор
+  const NotesListPage({super.key, this.showAppBar = true});
 
   @override
   State<NotesListPage> createState() => _NotesListPageState();
@@ -38,77 +43,86 @@ class _NotesListPageState extends State<NotesListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title:
-            _isSearching
-                ? TextField(
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    hintText: 'Поиск заметок...',
-                    border: InputBorder.none,
-                  ),
-                  autofocus: true,
-                  onChanged: (query) {
-                    context.read<NotesListCubit>().searchNotes(query);
+      appBar: widget.showAppBar 
+          ? AppBar(
+              title: _isSearching
+                  ? TextField(
+                      controller: _searchController,
+                      decoration: const InputDecoration(
+                        hintText: 'Поиск заметок...',
+                        border: InputBorder.none,
+                      ),
+                      autofocus: true,
+                      onChanged: (query) {
+                        context.read<NotesListCubit>().searchNotes(query);
+                      },
+                    )
+                  : const Text('Мои заметки'),
+              actions: [
+                IconButton(
+                  icon: Icon(_isSearching ? Icons.close : Icons.search),
+                  onPressed: () {
+                    setState(() {
+                      if (_isSearching) {
+                        _searchController.clear();
+                        context.read<NotesListCubit>().loadNotes();
+                      }
+                      _isSearching = !_isSearching;
+                    });
                   },
-                )
-                : const Text('Мои заметки'),
-        actions: [
-          IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search),
-            onPressed: () {
-              setState(() {
-                if (_isSearching) {
-                  _searchController.clear();
-                  context.read<NotesListCubit>().loadNotes();
-                }
-                _isSearching = !_isSearching;
-              });
-            },
-          ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'theme') {
-                _showThemeDialog();
-              } else if (value == 'sort_asc') {
-                setState(() {
-                  _sortAscending = true;
-                });
-                _sortNotes();
-              } else if (value == 'sort_desc') {
-                setState(() {
-                  _sortAscending = false;
-                });
-                _sortNotes();
-              }
-            },
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'sort_asc',
-                    child: ListTile(
-                      leading: Icon(Icons.arrow_upward),
-                      title: Text('Сортировать по дате (старые сверху)'),
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'theme') {
+                      _showThemeDialog();
+                    } else if (value == 'sort_asc') {
+                      setState(() {
+                        _sortAscending = true;
+                      });
+                      _sortNotes();
+                    } else if (value == 'sort_desc') {
+                      setState(() {
+                        _sortAscending = false;
+                      });
+                      _sortNotes();
+                    } else if (value == 'logout') {
+                      _logout();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'sort_asc',
+                      child: ListTile(
+                        leading: Icon(Icons.arrow_upward),
+                        title: Text('Сортировать по дате (старые сверху)'),
+                      ),
                     ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'sort_desc',
-                    child: ListTile(
-                      leading: Icon(Icons.arrow_downward),
-                      title: Text('Сортировать по дате (новые сверху)'),
+                    const PopupMenuItem(
+                      value: 'sort_desc',
+                      child: ListTile(
+                        leading: Icon(Icons.arrow_downward),
+                        title: Text('Сортировать по дате (новые сверху)'),
+                      ),
                     ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'theme',
-                    child: ListTile(
-                      leading: Icon(Icons.brightness_6),
-                      title: Text('Сменить тему'),
+                    const PopupMenuItem(
+                      value: 'theme',
+                      child: ListTile(
+                        leading: Icon(Icons.brightness_6),
+                        title: Text('Сменить тему'),
+                      ),
                     ),
-                  ),
-                ],
-          ),
-        ],
-      ),
+                    const PopupMenuItem(
+                      value: 'logout',
+                      child: ListTile(
+                        leading: Icon(Icons.exit_to_app),
+                        title: Text('Выйти из аккаунта'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          : null,
       body: BlocBuilder<NotesListCubit, NotesListState>(
         builder: (context, state) {
           if (state is NotesListLoading) {
@@ -221,6 +235,30 @@ class _NotesListPageState extends State<NotesListPage> {
               ],
             ),
           ),
+    );
+  }
+  
+  /// Выход из аккаунта
+  void _logout() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Выход из аккаунта'),
+        content: const Text('Вы уверены, что хотите выйти из аккаунта?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<AuthCubit>().signOut();
+            },
+            child: const Text('Выйти'),
+          ),
+        ],
+      ),
     );
   }
 }

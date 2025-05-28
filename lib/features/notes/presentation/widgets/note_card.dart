@@ -10,39 +10,35 @@ import 'package:notes_app/features/notes/presentation/pages/note_detail_page.dar
 class NoteCard extends StatelessWidget {
   final Note note;
 
-  const NoteCard({
-    Key? key,
-    required this.note,
-  }) : super(key: key);
+  const NoteCard({super.key, required this.note});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Dismissible(
       key: Key('note_${note.id}'),
       background: Container(
         color: Colors.red,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 16.0),
-        child: const Icon(
-          Icons.delete,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.delete, color: Colors.white),
       ),
       direction: DismissDirection.endToStart,
-      onDismissed: (_) {
+      onDismissed: (_) async {
         if (note.id != null) {
           // Удаляем заметку
-          context.read<NoteDetailCubit>().deleteNote(note.id!);
-          // Обновляем список заметок
-          context.read<NotesListCubit>().refreshNotes();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Заметка удалена'),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          await context.read<NoteDetailCubit>().deleteNote(note.id!);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Заметка удалена'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+            // Обновляем список заметок
+            context.read<NotesListCubit>().refreshNotes();
+          }
         }
       },
       confirmDismiss: (direction) async {
@@ -51,7 +47,9 @@ class NoteCard extends StatelessWidget {
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Подтверждение'),
-              content: const Text('Вы уверены, что хотите удалить эту заметку?'),
+              content: const Text(
+                'Вы уверены, что хотите удалить эту заметку?',
+              ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),

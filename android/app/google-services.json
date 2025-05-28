@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "641770734063",
+    "project_id": "notes-app-23dbb",
+    "storage_bucket": "notes-app-23dbb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641770734063:android:b158a31ffc969165fd361a",
+        "android_client_info": {
+          "package_name": "com.becandier.notesapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvH2J5so4Cl746eOOx3UnstdQnp2h4Y34"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

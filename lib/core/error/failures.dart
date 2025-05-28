@@ -15,6 +15,11 @@ class DatabaseFailure extends Failure {
   const DatabaseFailure({required super.message});
 }
 
+/// Ошибка аутентификации
+class AuthFailure extends Failure {
+  const AuthFailure({required super.message});
+}
+
 /// Ошибка валидации
 class ValidationFailure extends Failure {
   const ValidationFailure({required super.message});
