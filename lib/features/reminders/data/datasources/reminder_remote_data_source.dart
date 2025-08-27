@@ -3,7 +3,6 @@ import 'package:notes_app/core/services/supabase_service.dart';
 import 'package:notes_app/features/reminders/data/models/reminder_model.dart';
 import 'package:uuid/uuid.dart';
 
-/// Интерфейс удаленного источника данных для напоминаний
 abstract class ReminderRemoteDataSource {
   /// Получить все напоминания пользователя
   Future<List<ReminderModel>> getReminders();
@@ -24,12 +23,9 @@ abstract class ReminderRemoteDataSource {
   Future<void> scheduleNotification(ReminderModel reminder);
 }
 
-/// Реализация удаленного источника данных для напоминаний
 class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
-  /// Название таблицы в Supabase
   static const String _tableName = 'reminders';
 
-  /// Получить все напоминания пользователя
   @override
   Future<List<ReminderModel>> getReminders() async {
     try {
@@ -55,7 +51,6 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
     }
   }
 
-  /// Получить напоминание по ID
   @override
   Future<ReminderModel> getReminderById(String id) async {
     try {
@@ -81,7 +76,6 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
     }
   }
 
-  /// Создать новое напоминание
   @override
   Future<ReminderModel> createReminder(ReminderModel reminder) async {
     try {
@@ -117,7 +111,6 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
     }
   }
 
-  /// Обновить напоминание
   @override
   Future<ReminderModel> updateReminder(ReminderModel reminder) async {
     try {
@@ -153,7 +146,6 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
     }
   }
 
-  /// Удалить напоминание
   @override
   Future<void> deleteReminder(String id) async {
     try {
@@ -178,7 +170,6 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
     }
   }
 
-  /// Запланировать уведомление для напоминания через OneSignal
   @override
   Future<void> scheduleNotification(ReminderModel reminder) async {
     try {
@@ -198,7 +189,6 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
     }
   }
 
-  /// Запланировать уведомление для напоминания (внутренний метод)
   Future<void> _scheduleNotification(ReminderModel reminder) async {
     try {
       final userId = SupabaseService.client.auth.currentUser?.id;
@@ -224,7 +214,7 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
       // Поэтому нам нужно вычесть часовой пояс дважды
       final offset = DateTime.now().timeZoneOffset;
       final compensatedTime = notificationTime.subtract(offset);
-      
+
       final Map<String, dynamic> requestBody = {
         'reminder_id': reminder.id ?? '',
         'user_id': userId,
@@ -246,7 +236,6 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
     }
   }
 
-  /// Отменить уведомление для напоминания
   Future<void> _cancelNotification(String reminderId) async {
     try {
       final userId = SupabaseService.client.auth.currentUser?.id;
@@ -255,7 +244,6 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
         throw DatabaseException(message: 'Пользователь не авторизован');
       }
 
-      // Вызываем Supabase Edge Function для отмены удаленного уведомления
       await SupabaseService.client.functions.invoke(
         'cancel-notification',
         body: {'reminder_id': reminderId, 'user_id': userId},

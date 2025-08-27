@@ -9,10 +9,9 @@ import 'package:notes_app/features/reminders/domain/repositories/reminder_reposi
 /// Реализация репозитория для работы с напоминаниями
 class ReminderRepositoryImpl implements ReminderRepository {
   final ReminderRemoteDataSource remoteDataSource;
-  
-  /// Конструктор
+
   ReminderRepositoryImpl({required this.remoteDataSource});
-  
+
   @override
   Future<Either<Failure, List<Reminder>>> getReminders() async {
     try {
@@ -24,7 +23,7 @@ class ReminderRepositoryImpl implements ReminderRepository {
       return Left(DatabaseFailure(message: e.toString()));
     }
   }
-  
+
   @override
   Future<Either<Failure, Reminder>> getReminderById(String id) async {
     try {
@@ -36,7 +35,7 @@ class ReminderRepositoryImpl implements ReminderRepository {
       return Left(DatabaseFailure(message: e.toString()));
     }
   }
-  
+
   @override
   Future<Either<Failure, Reminder>> createReminder(Reminder reminder) async {
     try {
@@ -48,8 +47,10 @@ class ReminderRepositoryImpl implements ReminderRepository {
         reminderType: reminder.reminderType,
         userId: reminder.userId,
       );
-      
-      final createdReminder = await remoteDataSource.createReminder(reminderModel);
+
+      final createdReminder = await remoteDataSource.createReminder(
+        reminderModel,
+      );
       return Right(createdReminder);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.message));
@@ -57,7 +58,7 @@ class ReminderRepositoryImpl implements ReminderRepository {
       return Left(DatabaseFailure(message: e.toString()));
     }
   }
-  
+
   @override
   Future<Either<Failure, Reminder>> updateReminder(Reminder reminder) async {
     try {
@@ -69,8 +70,10 @@ class ReminderRepositoryImpl implements ReminderRepository {
         reminderType: reminder.reminderType,
         userId: reminder.userId,
       );
-      
-      final updatedReminder = await remoteDataSource.updateReminder(reminderModel);
+
+      final updatedReminder = await remoteDataSource.updateReminder(
+        reminderModel,
+      );
       return Right(updatedReminder);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.message));
@@ -78,7 +81,7 @@ class ReminderRepositoryImpl implements ReminderRepository {
       return Left(DatabaseFailure(message: e.toString()));
     }
   }
-  
+
   @override
   Future<Either<Failure, void>> deleteReminder(String id) async {
     try {

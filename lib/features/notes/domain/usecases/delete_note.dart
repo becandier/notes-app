@@ -9,16 +9,11 @@ class DeleteNote {
 
   DeleteNote(this.repository);
 
-  /// Выполняет удаление заметки по идентификатору
-  ///
-  /// [params] - параметры с идентификатором заметки
-  /// Возвращает Either с ошибкой [Failure] или void при успешном удалении
   Future<Either<Failure, void>> call(NoteParams params) async {
     return await repository.deleteNote(params.id);
   }
 }
 
-/// Параметры для удаления заметки
 class NoteParams extends Equatable {
   final int id;
 

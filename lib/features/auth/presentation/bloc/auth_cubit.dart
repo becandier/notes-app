@@ -9,7 +9,6 @@ import 'package:notes_app/features/auth/presentation/bloc/auth_state.dart';
 class AuthCubit extends Cubit<AppAuthState> {
   final AuthService _authService;
 
-  /// Конструктор
   AuthCubit({required AuthService authService})
     : _authService = authService,
       super(AppAuthState.initial()) {
@@ -18,7 +17,6 @@ class AuthCubit extends Cubit<AppAuthState> {
 
   /// Проверка аутентификации
   Future<void> checkAuth() async {
-    // Сначала переводим в состояние загрузки
     emit(AppAuthState.loading());
 
     try {
@@ -34,11 +32,9 @@ class AuthCubit extends Cubit<AppAuthState> {
         );
 
         if (user.emailConfirmedAt != null) {
-          // Привязываем пользователя к OneSignal
           await sl<OneSignalService>().setExternalUserId(user.id);
           emit(AppAuthState.authenticated(user));
         } else {
-          // Если email не подтвержден, выходим из системы и показываем сообщение
           await _authService.signOut();
           emit(
             AppAuthState.unauthenticated(
@@ -85,14 +81,11 @@ class AuthCubit extends Cubit<AppAuthState> {
 
     try {
       final user = await _authService.signIn(email: email, password: password);
-      
-      // Проверяем, что пользователь подтвердил email
+
       if (user.emailConfirmedAt != null) {
-        // Привязываем пользователя к OneSignal
         await sl<OneSignalService>().setExternalUserId(user.id);
         emit(AppAuthState.authenticated(user));
       } else {
-        // Если email не подтвержден, выходим из системы и показываем сообщение
         await _authService.signOut();
         emit(
           AppAuthState.unauthenticated(

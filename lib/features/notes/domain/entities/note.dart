@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 
 /// Сущность заметки
-/// 
 /// Содержит основную информацию о заметке: идентификатор, заголовок, текст, дату создания и идентификатор пользователя
 class Note extends Equatable {
   final int? id;

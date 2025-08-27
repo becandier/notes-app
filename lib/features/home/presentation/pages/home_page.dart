@@ -6,16 +6,15 @@ import 'package:notes_app/features/home/presentation/bloc/home_state.dart';
 import 'package:notes_app/features/notes/presentation/pages/notes_list_page.dart';
 import 'package:notes_app/features/reminders/presentation/pages/reminders_list_page.dart';
 
-/// Главная страница приложения с табами
 class HomePage extends StatefulWidget {
-  /// Конструктор
   const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -41,11 +40,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       create: (context) => context.read<HomeCubit>(),
       child: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
-          // Синхронизируем TabController с состоянием, если они различаются
           if (_tabController.index != state.tabIndex) {
             _tabController.animateTo(state.tabIndex);
           }
-          
+
           return Scaffold(
             appBar: AppBar(
               title: const Text('Мои записи'),
@@ -58,14 +56,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               bottom: TabBar(
                 controller: _tabController,
                 tabs: const [
-                  Tab(
-                    icon: Icon(Icons.note),
-                    text: 'Заметки',
-                  ),
-                  Tab(
-                    icon: Icon(Icons.alarm),
-                    text: 'Напоминания',
-                  ),
+                  Tab(icon: Icon(Icons.note), text: 'Заметки'),
+                  Tab(icon: Icon(Icons.alarm), text: 'Напоминания'),
                 ],
               ),
             ),
@@ -86,23 +78,24 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void _confirmLogout() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Выход из аккаунта'),
-        content: const Text('Вы действительно хотите выйти из аккаунта?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Отмена'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Выход из аккаунта'),
+            content: const Text('Вы действительно хотите выйти из аккаунта?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Отмена'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  context.read<AuthCubit>().signOut();
+                },
+                child: const Text('Выйти'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.read<AuthCubit>().signOut();
-            },
-            child: const Text('Выйти'),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,9 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app/features/notes/domain/entities/note.dart';
-import 'package:notes_app/features/notes/domain/usecases/create_note.dart' as create;
-import 'package:notes_app/features/notes/domain/usecases/delete_note.dart' as delete;
-import 'package:notes_app/features/notes/domain/usecases/get_note_by_id.dart' as get_by_id;
-import 'package:notes_app/features/notes/domain/usecases/update_note.dart' as update;
+import 'package:notes_app/features/notes/domain/usecases/create_note.dart'
+    as create;
+import 'package:notes_app/features/notes/domain/usecases/delete_note.dart'
+    as delete;
+import 'package:notes_app/features/notes/domain/usecases/get_note_by_id.dart'
+    as get_by_id;
+import 'package:notes_app/features/notes/domain/usecases/update_note.dart'
+    as update;
 import 'package:notes_app/features/notes/presentation/bloc/note_detail_state.dart';
 
 /// Кубит для управления отдельной заметкой
@@ -18,92 +22,102 @@ class NoteDetailCubit extends Cubit<NoteDetailState> {
     required create.CreateNote createNote,
     required update.UpdateNote updateNote,
     required delete.DeleteNote deleteNote,
-  })  : _getNoteById = getNoteById,
-        _createNote = createNote,
-        _updateNote = updateNote,
-        _deleteNote = deleteNote,
-        super(const NoteDetailInitial());
+  }) : _getNoteById = getNoteById,
+       _createNote = createNote,
+       _updateNote = updateNote,
+       _deleteNote = deleteNote,
+       super(const NoteDetailInitial());
 
-  /// Получить заметку по идентификатору
   Future<void> getNoteById(int id) async {
     emit(const NoteDetailLoading());
-    
+
     final result = await _getNoteById(get_by_id.NoteParams(id: id));
-    
+
     result.fold(
       (failure) => emit(NoteDetailError(message: failure.message)),
-      (note) => emit(NoteActionCompleted(
-        isSuccess: true, 
-        note: note, 
-        action: NoteAction.load
-      )),
+      (note) => emit(
+        NoteActionCompleted(
+          isSuccess: true,
+          note: note,
+          action: NoteAction.load,
+        ),
+      ),
     );
   }
 
-  /// Создать новую заметку
   Future<void> createNote(Note note) async {
     emit(const NoteDetailLoading());
-    
+
     final result = await _createNote(create.NoteParams(note: note));
-    
+
     result.fold(
-      (failure) => emit(NoteActionCompleted(
-        isSuccess: false, 
-        message: failure.message,
-        action: NoteAction.create
-      )),
+      (failure) => emit(
+        NoteActionCompleted(
+          isSuccess: false,
+          message: failure.message,
+          action: NoteAction.create,
+        ),
+      ),
       (createdNote) {
-        emit(NoteActionCompleted(
-          isSuccess: true, 
-          note: createdNote,
-          message: 'Заметка успешно создана',
-          action: NoteAction.create
-        ));
+        emit(
+          NoteActionCompleted(
+            isSuccess: true,
+            note: createdNote,
+            message: 'Заметка успешно создана',
+            action: NoteAction.create,
+          ),
+        );
       },
     );
   }
 
-  /// Обновить существующую заметку
   Future<void> updateNote(Note note) async {
     emit(const NoteDetailLoading());
-    
+
     final result = await _updateNote(update.NoteParams(note: note));
-    
+
     result.fold(
-      (failure) => emit(NoteActionCompleted(
-        isSuccess: false, 
-        message: failure.message,
-        action: NoteAction.update
-      )),
+      (failure) => emit(
+        NoteActionCompleted(
+          isSuccess: false,
+          message: failure.message,
+          action: NoteAction.update,
+        ),
+      ),
       (updatedNote) {
-        emit(NoteActionCompleted(
-          isSuccess: true, 
-          note: updatedNote,
-          message: 'Заметка успешно обновлена',
-          action: NoteAction.update
-        ));
+        emit(
+          NoteActionCompleted(
+            isSuccess: true,
+            note: updatedNote,
+            message: 'Заметка успешно обновлена',
+            action: NoteAction.update,
+          ),
+        );
       },
     );
   }
 
-  /// Удалить заметку
   Future<void> deleteNote(int id) async {
     emit(const NoteDetailLoading());
-    
+
     final result = await _deleteNote(delete.NoteParams(id: id));
-    
+
     result.fold(
-      (failure) => emit(NoteActionCompleted(
-        isSuccess: false, 
-        message: failure.message,
-        action: NoteAction.delete
-      )),
+      (failure) => emit(
+        NoteActionCompleted(
+          isSuccess: false,
+          message: failure.message,
+          action: NoteAction.delete,
+        ),
+      ),
       (_) {
-        emit(const NoteActionCompleted(
-          isSuccess: true, 
-          message: 'Заметка успешно удалена',
-          action: NoteAction.delete
-        ));
+        emit(
+          const NoteActionCompleted(
+            isSuccess: true,
+            message: 'Заметка успешно удалена',
+            action: NoteAction.delete,
+          ),
+        );
       },
     );
   }

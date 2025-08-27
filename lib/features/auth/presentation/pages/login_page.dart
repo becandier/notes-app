@@ -3,11 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:notes_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:notes_app/features/auth/presentation/pages/register_page.dart';
-import 'package:notes_app/features/notes/presentation/pages/notes_list_page.dart';
+import 'package:notes_app/features/home/presentation/pages/home_page.dart';
 
 /// Экран входа в систему
 class LoginPage extends StatefulWidget {
-  /// Конструктор
   const LoginPage({super.key});
 
   @override
@@ -35,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
         listener: (context, state) {
           if (state.status == AuthStatus.authenticated) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const NotesListPage()),
+              MaterialPageRoute(builder: (_) => const HomePage()),
             );
           } else if (state.status == AuthStatus.error) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -135,11 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: const Text('Войти', style: TextStyle(fontSize: 16)),
                   ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: _resetPassword,
-                    child: const Text('Забыли пароль?'),
-                  ),
+
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

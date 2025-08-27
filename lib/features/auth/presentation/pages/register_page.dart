@@ -3,11 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:notes_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:notes_app/features/auth/presentation/pages/login_page.dart';
-import 'package:notes_app/features/notes/presentation/pages/notes_list_page.dart';
+import 'package:notes_app/features/home/presentation/pages/home_page.dart';
 
 /// Экран регистрации
 class RegisterPage extends StatefulWidget {
-  /// Конструктор
   const RegisterPage({super.key});
 
   @override
@@ -38,11 +37,10 @@ class _RegisterPageState extends State<RegisterPage> {
         listener: (context, state) {
           if (state.status == AuthStatus.authenticated) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const NotesListPage()),
+              MaterialPageRoute(builder: (_) => const HomePage()),
             );
           } else if (state.status == AuthStatus.unauthenticated &&
               state.errorMessage != null) {
-            // Показываем диалог с информацией о подтверждении email
             showDialog(
               context: context,
               barrierDismissible: false,

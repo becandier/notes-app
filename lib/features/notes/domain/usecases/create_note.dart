@@ -10,21 +10,17 @@ class CreateNote {
 
   CreateNote(this.repository);
 
-  /// Выполняет создание новой заметки
-  ///
-  /// [params] - параметры с данными заметки
-  /// Возвращает Either с ошибкой [Failure] или созданную заметку [Note]
   Future<Either<Failure, Note>> call(NoteParams params) async {
-    // Проверка валидности заголовка
     if (params.note.title.isEmpty) {
-      return Left(const ValidationFailure(message: 'Заголовок не может быть пустым'));
+      return Left(
+        const ValidationFailure(message: 'Заголовок не может быть пустым'),
+      );
     }
-    
+
     return await repository.createNote(params.note);
   }
 }
 
-/// Параметры для создания заметки
 class NoteParams extends Equatable {
   final Note note;
 

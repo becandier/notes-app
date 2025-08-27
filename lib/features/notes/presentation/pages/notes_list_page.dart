@@ -11,8 +11,7 @@ import 'package:notes_app/features/notes/presentation/widgets/note_card.dart';
 class NotesListPage extends StatefulWidget {
   /// Показывать ли AppBar
   final bool showAppBar;
-  
-  /// Конструктор
+
   const NotesListPage({super.key, this.showAppBar = true});
 
   @override
@@ -43,86 +42,91 @@ class _NotesListPageState extends State<NotesListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: widget.showAppBar 
-          ? AppBar(
-              title: _isSearching
-                  ? TextField(
-                      controller: _searchController,
-                      decoration: const InputDecoration(
-                        hintText: 'Поиск заметок...',
-                        border: InputBorder.none,
-                      ),
-                      autofocus: true,
-                      onChanged: (query) {
-                        context.read<NotesListCubit>().searchNotes(query);
-                      },
-                    )
-                  : const Text('Мои заметки'),
-              actions: [
-                IconButton(
-                  icon: Icon(_isSearching ? Icons.close : Icons.search),
-                  onPressed: () {
-                    setState(() {
-                      if (_isSearching) {
-                        _searchController.clear();
-                        context.read<NotesListCubit>().loadNotes();
+      appBar:
+          widget.showAppBar
+              ? AppBar(
+                title:
+                    _isSearching
+                        ? TextField(
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: 'Поиск заметок...',
+                            border: InputBorder.none,
+                          ),
+                          autofocus: true,
+                          onChanged: (query) {
+                            context.read<NotesListCubit>().searchNotes(query);
+                          },
+                        )
+                        : const Text('Мои заметки'),
+                actions: [
+                  IconButton(
+                    icon: Icon(_isSearching ? Icons.close : Icons.search),
+                    onPressed: () {
+                      setState(() {
+                        if (_isSearching) {
+                          _searchController.clear();
+                          context.read<NotesListCubit>().loadNotes();
+                        }
+                        _isSearching = !_isSearching;
+                      });
+                    },
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'theme') {
+                        _showThemeDialog();
+                      } else if (value == 'sort_asc') {
+                        setState(() {
+                          _sortAscending = true;
+                        });
+                        _sortNotes();
+                      } else if (value == 'sort_desc') {
+                        setState(() {
+                          _sortAscending = false;
+                        });
+                        _sortNotes();
+                      } else if (value == 'logout') {
+                        _logout();
                       }
-                      _isSearching = !_isSearching;
-                    });
-                  },
-                ),
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'theme') {
-                      _showThemeDialog();
-                    } else if (value == 'sort_asc') {
-                      setState(() {
-                        _sortAscending = true;
-                      });
-                      _sortNotes();
-                    } else if (value == 'sort_desc') {
-                      setState(() {
-                        _sortAscending = false;
-                      });
-                      _sortNotes();
-                    } else if (value == 'logout') {
-                      _logout();
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'sort_asc',
-                      child: ListTile(
-                        leading: Icon(Icons.arrow_upward),
-                        title: Text('Сортировать по дате (старые сверху)'),
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'sort_desc',
-                      child: ListTile(
-                        leading: Icon(Icons.arrow_downward),
-                        title: Text('Сортировать по дате (новые сверху)'),
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'theme',
-                      child: ListTile(
-                        leading: Icon(Icons.brightness_6),
-                        title: Text('Сменить тему'),
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'logout',
-                      child: ListTile(
-                        leading: Icon(Icons.exit_to_app),
-                        title: Text('Выйти из аккаунта'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            )
-          : null,
+                    },
+                    itemBuilder:
+                        (context) => [
+                          const PopupMenuItem(
+                            value: 'sort_asc',
+                            child: ListTile(
+                              leading: Icon(Icons.arrow_upward),
+                              title: Text(
+                                'Сортировать по дате (старые сверху)',
+                              ),
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'sort_desc',
+                            child: ListTile(
+                              leading: Icon(Icons.arrow_downward),
+                              title: Text('Сортировать по дате (новые сверху)'),
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'theme',
+                            child: ListTile(
+                              leading: Icon(Icons.brightness_6),
+                              title: Text('Сменить тему'),
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'logout',
+                            child: ListTile(
+                              leading: Icon(Icons.exit_to_app),
+                              title: Text('Выйти из аккаунта'),
+                            ),
+                          ),
+                        ],
+                  ),
+                ],
+              )
+              : null,
       body: BlocBuilder<NotesListCubit, NotesListState>(
         builder: (context, state) {
           if (state is NotesListLoading) {
@@ -237,28 +241,29 @@ class _NotesListPageState extends State<NotesListPage> {
           ),
     );
   }
-  
+
   /// Выход из аккаунта
   void _logout() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Выход из аккаунта'),
-        content: const Text('Вы уверены, что хотите выйти из аккаунта?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Выход из аккаунта'),
+            content: const Text('Вы уверены, что хотите выйти из аккаунта?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Отмена'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.read<AuthCubit>().signOut();
+                },
+                child: const Text('Выйти'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.read<AuthCubit>().signOut();
-            },
-            child: const Text('Выйти'),
-          ),
-        ],
-      ),
     );
   }
 }

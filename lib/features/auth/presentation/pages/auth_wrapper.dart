@@ -6,11 +6,7 @@ import 'package:notes_app/features/auth/presentation/pages/login_page.dart';
 import 'package:notes_app/features/home/presentation/pages/home_page.dart';
 
 /// Обертка для проверки аутентификации
-///
-/// Перенаправляет на экран входа, если пользователь не аутентифицирован,
-/// или на экран списка заметок, если пользователь аутентифицирован
 class AuthWrapper extends StatelessWidget {
-  /// Конструктор
   const AuthWrapper({super.key});
 
   @override
