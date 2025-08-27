@@ -1,24 +1,26 @@
 import 'package:dartz/dartz.dart';
 import 'package:notes_app/core/error/exceptions.dart';
 import 'package:notes_app/core/error/failures.dart';
-import 'package:notes_app/features/notes/data/datasources/note_local_data_source.dart';
+import 'package:notes_app/features/notes/data/datasources/note_remote_data_source.dart';
 import 'package:notes_app/features/notes/data/models/note_model.dart';
 import 'package:notes_app/features/notes/domain/entities/note.dart';
 import 'package:notes_app/features/notes/domain/repositories/note_repository.dart';
 
 /// Реализация репозитория для работы с заметками
 class NoteRepositoryImpl implements NoteRepository {
-  final NoteLocalDataSource localDataSource;
+  final NoteRemoteDataSource remoteDataSource;
 
-  NoteRepositoryImpl({required this.localDataSource});
+  NoteRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<Either<Failure, List<Note>>> getNotes() async {
     try {
-      final notes = await localDataSource.getNotes();
+      final notes = await remoteDataSource.getNotes();
       return Right(notes);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.message));
+    } on AppAuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -27,10 +29,12 @@ class NoteRepositoryImpl implements NoteRepository {
   @override
   Future<Either<Failure, List<Note>>> searchNotes(String query) async {
     try {
-      final notes = await localDataSource.searchNotes(query);
+      final notes = await remoteDataSource.searchNotes(query);
       return Right(notes);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.message));
+    } on AppAuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -39,10 +43,12 @@ class NoteRepositoryImpl implements NoteRepository {
   @override
   Future<Either<Failure, Note>> getNoteById(int id) async {
     try {
-      final note = await localDataSource.getNoteById(id);
+      final note = await remoteDataSource.getNoteById(id);
       return Right(note);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.message));
+    } on AppAuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -57,10 +63,12 @@ class NoteRepositoryImpl implements NoteRepository {
         createdAt: note.createdAt,
       );
       
-      final createdNote = await localDataSource.createNote(noteModel);
+      final createdNote = await remoteDataSource.createNote(noteModel);
       return Right(createdNote);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.message));
+    } on AppAuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -80,10 +88,12 @@ class NoteRepositoryImpl implements NoteRepository {
         createdAt: note.createdAt,
       );
       
-      final updatedNote = await localDataSource.updateNote(noteModel);
+      final updatedNote = await remoteDataSource.updateNote(noteModel);
       return Right(updatedNote);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.message));
+    } on AppAuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -92,10 +102,12 @@ class NoteRepositoryImpl implements NoteRepository {
   @override
   Future<Either<Failure, void>> deleteNote(int id) async {
     try {
-      await localDataSource.deleteNote(id);
+      await remoteDataSource.deleteNote(id);
       return const Right(null);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(message: e.message));
+    } on AppAuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }

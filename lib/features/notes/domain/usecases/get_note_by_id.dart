@@ -10,16 +10,11 @@ class GetNoteById {
 
   GetNoteById(this.repository);
 
-  /// Выполняет получение заметки по идентификатору
-  ///
-  /// [params] - параметры с идентификатором заметки
-  /// Возвращает Either с ошибкой [Failure] или заметку [Note]
   Future<Either<Failure, Note>> call(NoteParams params) async {
-    return await repository.getNoteById(params.id); 
+    return await repository.getNoteById(params.id);
   }
 }
 
-/// Параметры для получения заметки по идентификатору
 class NoteParams extends Equatable {
   final int id;
 

@@ -10,16 +10,11 @@ class SearchNotes {
 
   SearchNotes(this.repository);
 
-  /// Выполняет поиск заметок по запросу
-  ///
-  /// [params] - параметры поиска
-  /// Возвращает Either с ошибкой [Failure] или списком найденных заметок [List<Note>]
   Future<Either<Failure, List<Note>>> call(SearchParams params) async {
     return await repository.searchNotes(params.query);
   }
 }
 
-/// Параметры для поиска заметок
 class SearchParams extends Equatable {
   final String query;
 
